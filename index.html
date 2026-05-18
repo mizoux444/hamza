@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Yacine TV - GitHub Live Sync</title>
 
-<!-- مشغل HLS لتشغيل روابط m3u8 بسلاسة -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-<!-- Google Fonts لإضافة خط عربي احترافي -->
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
@@ -27,7 +23,7 @@
 *{
     box-sizing: border-box;
     font-family: 'Cairo', Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent; /* إزالة الوميض الأزرق عند اللمس في الهواتف */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body{
@@ -41,394 +37,164 @@ body{
     overflow-x: hidden;
 }
 
-/* الهيدر العلوي لشعار التطبيق والبحث */
-header {
+header{
     background: linear-gradient(135deg, var(--yacine-dark-red), #050505);
     padding: 10px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid var(--yacine-red);
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.2);
-    z-index: 101;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #fff;
+header h1{
+    margin:0;
+    font-size:1.1rem;
+    font-weight:800;
 }
 
-header h1 span {
+header h1 span{
     background: var(--yacine-red);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-right: 3px;
+    padding:1px 6px;
+    border-radius:4px;
 }
 
-.search-container {
-    width: 140px;
+.search-container input{
+    width:140px;
+    padding:6px;
+    border-radius:6px;
+    border:1px solid #333;
+    background:#000;
+    color:#fff;
 }
 
-.search-container input {
-    width: 100%;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid #3f3f46;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    font-size: 0.8rem;
-    outline: none;
+.player-container{
+    width:100%;
+    aspect-ratio:16/9;
+    background:#000;
+    position:sticky;
+    top:0;
 }
 
-.search-container input:focus {
-    border-color: var(--yacine-red);
+video{
+    width:100%;
+    height:100%;
 }
 
-/* مشغل الفيديو المثبت في الأعلى للهواتف */
-.player-container {
-    width: 100%;
-    aspect-ratio: 16 / 9; /* الحفاظ على أبعاد الفيديو تلقائياً */
-    background: #000;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+.tabs-container{
+    display:flex;
+    overflow-x:auto;
+    background:#101014;
+    padding:10px;
+    gap:8px;
 }
 
-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+.tab-button{
+    background:var(--bg-card);
+    color:var(--text-muted);
+    padding:6px 14px;
+    border-radius:20px;
+    border:1px solid #27272a;
+    cursor:pointer;
 }
 
-/* شريط التبويب السريع للتنقل بين الأقسام بإصبعك */
-.tabs-container {
-    display: flex;
-    background: #101014;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px;
-    gap: 8px;
-    border-bottom: 1px solid #232329;
-    position: sticky;
-    top: calc(100vw * 9 / 16); /* يثبت مباشرة تحت الفيديو في الهواتف */
-    z-index: 99;
+.tab-button.active{
+    background:var(--yacine-red);
+    color:#fff;
 }
 
-.tabs-container::-webkit-scrollbar {
-    display: none; /* إخفاء السكرول بار لمظهر التطبيقات */
+.channels-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    padding:10px;
 }
 
-.tab-button {
-    background: var(--bg-card);
-    color: var(--text-muted);
-    border: 1px solid #27272a;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.channel-card{
+    background:var(--bg-card);
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    cursor:pointer;
 }
 
-.tab-button.active {
-    background: var(--yacine-red);
-    color: #fff;
-    border-color: var(--yacine-red);
-}
-
-/* حاوية القنوات الرئيسية */
-.channels-container {
-    padding: 12px;
-    flex: 1;
-}
-
-.category-header {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #fff;
-    margin: 15px 5px 10px 0;
-    padding-right: 8px;
-    border-right: 3px solid var(--yacine-red);
-}
-
-/* شبكة الكروت (Grid) */
-.channels-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 أعمدة متناسقة في الهاتف */
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-@media (max-width: 360px) {
-    .channels-grid {
-        grid-template-columns: repeat(2, 1fr); /* عمودين للهواتف الصغيرة جداً */
-    }
-}
-
-.channel-card {
-    background: var(--bg-card);
-    border: 1px solid #27272a;
-    border-radius: 8px;
-    padding: 10px 5px;
-    text-align: center;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 70px;
-    transition: background 0.2s;
-}
-
-.channel-card .icon {
-    font-size: 1.1rem;
-    color: var(--yacine-red);
-    margin-bottom: 3px;
-}
-
-.channel-card .name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-color);
-    line-height: 1.2;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* القناة الشغالة حالياً */
-.channel-card.active {
-    background: var(--yacine-red);
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
-}
-.channel-card.active .icon, 
-.channel-card.active .name {
-    color: #fff;
-}
-
-.loading-msg {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-muted);
-    font-size: 1rem;
-}
-
-/* دعم شاشات الكمبيوتر والمتصفحات الكبيرة ليبقى التصميم متناسقاً */
-@media (min-width: 993px) {
-    body { height: 100vh; overflow: hidden; }
-    .main-wrapper { display: flex; flex: 1; height: calc(100vh - 60px); }
-    .player-container { flex: 6; height: 100%; aspect-ratio: auto; position: relative; top: 0; }
-    .content-sidebar { flex: 4; display: flex; flex-direction: column; background: var(--bg-sidebar); border-right: 1px solid #27272a; overflow-y: auto; }
-    .tabs-container { position: relative; top: 0; }
-    .channels-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-    .channel-card:hover { background: var(--bg-card-hover); border-color: var(--yacine-red); }
+.channel-card.active{
+    background:var(--yacine-red);
 }
 </style>
-
 </head>
 
 <body>
 
-<!-- HEADER -->
 <header>
-    <h1>YACINE <span>TV</span> CLOUD</h1>
-    <div class="search-container">
-        <input type="text" id="searchChannel" placeholder="بحث...">
-    </div>
+<h1>YACINE <span>TV</span></h1>
+<div class="search-container">
+<input type="text" id="searchChannel" placeholder="بحث...">
+</div>
 </header>
 
-<!-- CONTAINER -->
-<div class="main-wrapper">
-
-    <!-- PLAYER -->
-    <div class="player-container">
-        <video id="video" controls autoplay playsinline></video>
-    </div>
-
-    <!-- CONTENT SIDEBAR -->
-    <div class="content-sidebar">
-        <!-- شريط التبويبات السريعة -->
-        <div class="tabs-container" id="tabs">
-            <button class="tab-button active" onclick="scrollToCategory('all')">الكل</button>
-        </div>
-
-        <!-- قائمة القنوات المتغيرة -->
-        <div class="channels-container" id="list">
-            <div class="loading-msg" id="loading">جاري جلب القنوات من سيرفر GitHub...</div>
-        </div>
-    </div>
-
+<div class="player-container">
+<video id="video" controls autoplay playsinline></video>
 </div>
 
-<script>
+<div class="tabs-container" id="tabs"></div>
+<div id="list"></div>
 
-let video = document.getElementById("video");
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script>
+let video=document.getElementById("video");
 let hls;
 
-// 🔗 رابط الـ RAW المباشر لملف الـ JSON الخاص بك على مستودع GitHub
-const GITHUB_JSON_URL = "https://raw.githubusercontent.com/mizoux444/hamza/main/tv.json";
+const GITHUB_JSON_URL="https://raw.githubusercontent.com/mizoux444/hamza/main/tv.json";
 
-/* ================= دالة تشغيل البث ================= */
-function play(url, element){
-    document.querySelectorAll('.channel-card').forEach(el => el.classList.remove('active'));
-    if(element) {
-        element.classList.add('active');
-    }
+function play(url,el){
+document.querySelectorAll('.channel-card').forEach(e=>e.classList.remove('active'));
+if(el) el.classList.add('active');
 
-    if(Hls.isSupported()){
-        if(hls) hls.destroy();
-        hls = new Hls({ enableWorker:true, lowLatencyMode:true });
-        hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function(){ video.play(); });
-    } else {
-        video.src = url;
-        video.play();
-    }
+if(Hls.isSupported()){
+if(hls) hls.destroy();
+hls=new Hls();
+hls.loadSource(url);
+hls.attachMedia(video);
+hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+}else{
+video.src=url;
+video.play();
+}
 }
 
-/* ================= جلب البيانات من الكلاود (GitHub) ================= */
-async function loadChannels() {
-    try {
-        let response = await fetch(GITHUB_JSON_URL);
-        if(!response.ok) throw new Error("فشل الاتصال بـ GitHub");
-        
-        let channelsData = await response.json();
-        
-        // إزالة رسالة التحميل والبدء في بناء الواجهة
-        document.getElementById("loading").remove(); 
-        renderUI(channelsData);
-    } catch (error) {
-        console.error(error);
-        document.getElementById("loading").innerText = "خطأ: فشل تحميل القنوات. يرجى التأكد من رفع ملف الـ JSON بشكل صحيح.";
-    }
+async function loadChannels(){
+let res=await fetch(GITHUB_JSON_URL);
+let data=await res.json();
+render(data);
 }
 
-/* ================= بناء عناصر الواجهة برمجياً ================= */
-function renderUI(channels) {
-    let listContainer = document.getElementById("list");
-    let tabsContainer = document.getElementById("tabs");
-    let firstChannelElement = null;
-    let firstChannelUrl = "";
+function render(channels){
+let tabs=document.getElementById("tabs");
+let list=document.getElementById("list");
 
-    channels.forEach(cat => {
-        // 1. إنشاء أزرار التبويب العلوي
-        let tabBtn = document.createElement("button");
-        tabBtn.className = "tab-button";
-        tabBtn.innerText = cat.name.split(" - ")[0];
-        tabBtn.onclick = () => {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            tabBtn.classList.add('active');
-            scrollToCategory(cat.id);
-        };
-        tabsContainer.appendChild(tabBtn);
+channels.forEach(cat=>{
+let btn=document.createElement("button");
+btn.innerText=cat.name;
+btn.className="tab-button";
+tabs.appendChild(btn);
 
-        // 2. إنشاء حاوية القسم الرئيسي
-        let catWrapper = document.createElement("div");
-        catWrapper.id = cat.id;
+let grid=document.createElement("div");
+grid.className="channels-grid";
 
-        let catHeader = document.createElement("div");
-        catHeader.className = "category-header";
-        catHeader.innerHTML = cat.name;
-        catWrapper.appendChild(catHeader);
+cat.list.forEach(ch=>{
+let card=document.createElement("div");
+card.className="channel-card";
+card.innerHTML=ch.name;
+card.onclick=()=>play(ch.url,card);
+grid.appendChild(card);
+});
 
-        // 3. إنشاء شبكة الكروت (Grid)
-        let gridDiv = document.createElement("div");
-        gridDiv.className = "channels-grid";
-
-        cat.list.forEach(ch => {
-            let card = document.createElement("div");
-            card.className = "channel-card";
-            card.innerHTML = `
-                <div class="icon">📺</div>
-                <div class="name">${ch.name}</div>
-            `;
-
-            card.onclick = () => {
-                play(ch.url, card);
-            };
-
-            gridDiv.appendChild(card);
-            
-            // حفظ أول قناة في الملف لتشغيلها آلياً بمجرد فتح التطبيق
-            if(!firstChannelElement) {
-                firstChannelElement = card;
-                firstChannelUrl = ch.url;
-            }
-        });
-
-        catWrapper.appendChild(gridDiv);
-        listContainer.appendChild(catWrapper);
-    });
-
-    // التشغيل التلقائي لأول قناة
-    if(firstChannelElement && firstChannelUrl) {
-        play(firstChannelUrl, firstChannelElement);
-    }
-
-    // تفعيل محرك البحث الذكي بعد تحميل القنوات
-    initSearch(channels);
+list.appendChild(grid);
+});
 }
 
-/* التمرير السلس والأنيق عند الضغط على التبويبات */
-function scrollToCategory(id) {
-    if(id === 'all') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.querySelector('.content-sidebar').scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-        let element = document.getElementById(id);
-        if(element) {
-            let yOffset = -70; 
-            if (window.innerWidth <= 992) {
-                let y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({top: y, behavior: 'smooth'});
-            } else {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    }
-}
-
-/* ================= محرك البحث الذكي ================= */
-function initSearch(channels) {
-    document.getElementById('searchChannel').addEventListener('input', function(e) {
-        let filter = e.target.value.toLowerCase();
-        let channelCards = document.querySelectorAll('.channel-card');
-        
-        channelCards.forEach(card => {
-            let nameText = card.querySelector('.name').textContent.toLowerCase();
-            if(nameText.includes(filter)) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
-        });
-
-        channels.forEach(cat => {
-            let wrapper = document.getElementById(cat.id);
-            if(wrapper) {
-                let visibleCards = wrapper.querySelectorAll('.channel-card[style="display: flex;"]');
-                let allCards = wrapper.querySelectorAll('.channel-card');
-                
-                if(filter !== "" && visibleCards.length === 0 && allCards.length > 0) {
-                    wrapper.style.display = "none";
-                } else {
-                    wrapper.style.display = "block";
-                }
-            }
-        });
-    });
-}
-
-// بدء تشغيل التطبيق وجلب البيانات فوراً
 loadChannels();
-
 </script>
 
 </body>
