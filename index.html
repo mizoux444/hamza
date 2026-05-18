@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mizoux TV</title>
+<title>Yacine TV - GitHub Live Sync</title>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -126,7 +126,7 @@ video{
 <body>
 
 <header>
-<h1>Mizoux <span>TV</span></h1>
+<h1>YACINE <span>TV</span></h1>
 <div class="search-container">
 <input type="text" id="searchChannel" placeholder="بحث...">
 </div>
@@ -145,7 +145,7 @@ video{
 let video=document.getElementById("video");
 let hls;
 
-const GITHUB_JSON_URL="https://raw.githubusercontent.com/mizoux444/hamza/main/channels.json";
+const GITHUB_JSON_URL="https://raw.githubusercontent.com/mizoux444/hamza/main/tv.json";
 
 function play(url,el){
 document.querySelectorAll('.channel-card').forEach(e=>e.classList.remove('active'));
